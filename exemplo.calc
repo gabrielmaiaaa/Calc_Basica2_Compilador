@@ -1,0 +1,17 @@
+PROGRAMA fatorial_exemplo
+INICIO
+    { DECLARACOES }
+    INTEIRO arg, fat
+    { ALGORITMO }
+    { Calcula o fatorial de um número inteiro }
+    LEIA arg
+    fat := arg
+    SE arg .I. 0
+        ENTAO fat := 1
+    FIM_SE
+    ENQUANTO arg .M. 1
+        fat := fat * arg
+        arg := arg - 1
+    FIM_ENQUANTO
+    ESCREVA 'fatorial = ', fat
+FIM

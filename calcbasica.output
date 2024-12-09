@@ -1,0 +1,899 @@
+Terminals unused in grammar
+
+    TIPO_LISTA_INT
+    TIPO_LISTA_REAL
+    ABRE_COLCHETE
+    FECHA_COLCHETE
+    y
+
+
+Grammar
+
+    0 $accept: programa $end
+
+    1 programa: PROGRAMA VARIAVEL bloco FIM
+
+    2 bloco: INICIO declaracoes comandos
+
+    3 declaracoes: tipo lista_variaveis
+    4            | declaracoes tipo lista_variaveis
+
+    5 tipo: TIPO_INTEIRO
+    6     | TIPO_REAL
+    7     | TIPO_CARACTER
+
+    8 lista_variaveis: VARIAVEL
+    9                | lista_variaveis VIRGULA VARIAVEL
+
+   10 comandos: comando
+   11         | comandos comando
+
+   12 comando: atribuicao
+   13        | escrita
+   14        | leitura
+   15        | condicao
+   16        | repeticao
+
+   17 condicao: SE expressao ENTAO comandos FIM_SE
+
+   18 repeticao: ENQUANTO expressao comandos FIM_ENQUANTO
+
+   19 atribuicao: VARIAVEL ATRIBUICAO expressao
+
+   20 escrita: ESCREVA ABRE_PARENTESE lista_argumentos FECHA_PARENTESE
+   21        | ESCREVA lista_argumentos
+
+   22 lista_argumentos: expressao
+   23                 | CADEIA
+   24                 | lista_argumentos VIRGULA expressao
+
+   25 leitura: LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE
+   26        | LEIA VARIAVEL
+
+   27 expressao: CONSTANTE_INTEIRA
+   28          | CONSTANTE_REAL
+   29          | VARIAVEL
+   30          | expressao ADICAO expressao
+   31          | expressao SUBTRACAO expressao
+   32          | expressao PRODUTO expressao
+   33          | expressao DIVISAO expressao
+   34          | expressao IGUAL expressao
+   35          | expressao MAIOR expressao
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    PROGRAMA (258) 1
+    SE (259) 17
+    ENQUANTO (260) 18
+    ENTAO (261) 17
+    ESCREVA (262) 20 21
+    FIM_SE (263) 17
+    FIM_ENQUANTO (264) 18
+    FIM (265) 1
+    INICIO (266) 2
+    LEIA (267) 25 26
+    ADICAO (268) 30
+    ATRIBUICAO (269) 19
+    DIVISAO (270) 33
+    PRODUTO (271) 32
+    SUBTRACAO (272) 31
+    IGUAL (273) 34
+    MAIOR (274) 35
+    TIPO_CARACTER (275) 7
+    TIPO_INTEIRO (276) 5
+    TIPO_LISTA_INT (277)
+    TIPO_LISTA_REAL (278)
+    TIPO_REAL (279) 6
+    ABRE_PARENTESE (280) 20 25
+    FECHA_PARENTESE (281) 20 25
+    ABRE_COLCHETE (282)
+    FECHA_COLCHETE (283)
+    VIRGULA (284) 9 24
+    CONSTANTE_INTEIRA (285) 27
+    CONSTANTE_REAL (286) 28
+    VARIAVEL (287) 1 8 9 19 25 26 29
+    CADEIA (288) 23
+    y (289)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (35)
+        on left: 0
+    programa (36)
+        on left: 1
+        on right: 0
+    bloco (37)
+        on left: 2
+        on right: 1
+    declaracoes (38)
+        on left: 3 4
+        on right: 2 4
+    tipo (39)
+        on left: 5 6 7
+        on right: 3 4
+    lista_variaveis (40)
+        on left: 8 9
+        on right: 3 4 9
+    comandos (41)
+        on left: 10 11
+        on right: 2 11 17 18
+    comando (42)
+        on left: 12 13 14 15 16
+        on right: 10 11
+    condicao (43)
+        on left: 17
+        on right: 15
+    repeticao (44)
+        on left: 18
+        on right: 16
+    atribuicao (45)
+        on left: 19
+        on right: 12
+    escrita (46)
+        on left: 20 21
+        on right: 13
+    lista_argumentos (47)
+        on left: 22 23 24
+        on right: 20 21 24
+    leitura (48)
+        on left: 25 26
+        on right: 14
+    expressao (49)
+        on left: 27 28 29 30 31 32 33 34 35
+        on right: 17 18 19 22 24 30 31 32 33 34 35
+
+
+State 0
+
+    0 $accept: • programa $end
+
+    PROGRAMA  shift, and go to state 1
+
+    programa  go to state 2
+
+
+State 1
+
+    1 programa: PROGRAMA • VARIAVEL bloco FIM
+
+    VARIAVEL  shift, and go to state 3
+
+
+State 2
+
+    0 $accept: programa • $end
+
+    $end  shift, and go to state 4
+
+
+State 3
+
+    1 programa: PROGRAMA VARIAVEL • bloco FIM
+
+    INICIO  shift, and go to state 5
+
+    bloco  go to state 6
+
+
+State 4
+
+    0 $accept: programa $end •
+
+    $default  accept
+
+
+State 5
+
+    2 bloco: INICIO • declaracoes comandos
+
+    TIPO_CARACTER  shift, and go to state 7
+    TIPO_INTEIRO   shift, and go to state 8
+    TIPO_REAL      shift, and go to state 9
+
+    declaracoes  go to state 10
+    tipo         go to state 11
+
+
+State 6
+
+    1 programa: PROGRAMA VARIAVEL bloco • FIM
+
+    FIM  shift, and go to state 12
+
+
+State 7
+
+    7 tipo: TIPO_CARACTER •
+
+    $default  reduce using rule 7 (tipo)
+
+
+State 8
+
+    5 tipo: TIPO_INTEIRO •
+
+    $default  reduce using rule 5 (tipo)
+
+
+State 9
+
+    6 tipo: TIPO_REAL •
+
+    $default  reduce using rule 6 (tipo)
+
+
+State 10
+
+    2 bloco: INICIO declaracoes • comandos
+    4 declaracoes: declaracoes • tipo lista_variaveis
+
+    SE             shift, and go to state 13
+    ENQUANTO       shift, and go to state 14
+    ESCREVA        shift, and go to state 15
+    LEIA           shift, and go to state 16
+    TIPO_CARACTER  shift, and go to state 7
+    TIPO_INTEIRO   shift, and go to state 8
+    TIPO_REAL      shift, and go to state 9
+    VARIAVEL       shift, and go to state 17
+
+    tipo        go to state 18
+    comandos    go to state 19
+    comando     go to state 20
+    condicao    go to state 21
+    repeticao   go to state 22
+    atribuicao  go to state 23
+    escrita     go to state 24
+    leitura     go to state 25
+
+
+State 11
+
+    3 declaracoes: tipo • lista_variaveis
+
+    VARIAVEL  shift, and go to state 26
+
+    lista_variaveis  go to state 27
+
+
+State 12
+
+    1 programa: PROGRAMA VARIAVEL bloco FIM •
+
+    $default  reduce using rule 1 (programa)
+
+
+State 13
+
+   17 condicao: SE • expressao ENTAO comandos FIM_SE
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 31
+
+
+State 14
+
+   18 repeticao: ENQUANTO • expressao comandos FIM_ENQUANTO
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 32
+
+
+State 15
+
+   20 escrita: ESCREVA • ABRE_PARENTESE lista_argumentos FECHA_PARENTESE
+   21        | ESCREVA • lista_argumentos
+
+    ABRE_PARENTESE     shift, and go to state 33
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+    CADEIA             shift, and go to state 34
+
+    lista_argumentos  go to state 35
+    expressao         go to state 36
+
+
+State 16
+
+   25 leitura: LEIA • ABRE_PARENTESE VARIAVEL FECHA_PARENTESE
+   26        | LEIA • VARIAVEL
+
+    ABRE_PARENTESE  shift, and go to state 37
+    VARIAVEL        shift, and go to state 38
+
+
+State 17
+
+   19 atribuicao: VARIAVEL • ATRIBUICAO expressao
+
+    ATRIBUICAO  shift, and go to state 39
+
+
+State 18
+
+    4 declaracoes: declaracoes tipo • lista_variaveis
+
+    VARIAVEL  shift, and go to state 26
+
+    lista_variaveis  go to state 40
+
+
+State 19
+
+    2 bloco: INICIO declaracoes comandos •
+   11 comandos: comandos • comando
+
+    SE        shift, and go to state 13
+    ENQUANTO  shift, and go to state 14
+    ESCREVA   shift, and go to state 15
+    LEIA      shift, and go to state 16
+    VARIAVEL  shift, and go to state 17
+
+    $default  reduce using rule 2 (bloco)
+
+    comando     go to state 41
+    condicao    go to state 21
+    repeticao   go to state 22
+    atribuicao  go to state 23
+    escrita     go to state 24
+    leitura     go to state 25
+
+
+State 20
+
+   10 comandos: comando •
+
+    $default  reduce using rule 10 (comandos)
+
+
+State 21
+
+   15 comando: condicao •
+
+    $default  reduce using rule 15 (comando)
+
+
+State 22
+
+   16 comando: repeticao •
+
+    $default  reduce using rule 16 (comando)
+
+
+State 23
+
+   12 comando: atribuicao •
+
+    $default  reduce using rule 12 (comando)
+
+
+State 24
+
+   13 comando: escrita •
+
+    $default  reduce using rule 13 (comando)
+
+
+State 25
+
+   14 comando: leitura •
+
+    $default  reduce using rule 14 (comando)
+
+
+State 26
+
+    8 lista_variaveis: VARIAVEL •
+
+    $default  reduce using rule 8 (lista_variaveis)
+
+
+State 27
+
+    3 declaracoes: tipo lista_variaveis •
+    9 lista_variaveis: lista_variaveis • VIRGULA VARIAVEL
+
+    VIRGULA  shift, and go to state 42
+
+    $default  reduce using rule 3 (declaracoes)
+
+
+State 28
+
+   27 expressao: CONSTANTE_INTEIRA •
+
+    $default  reduce using rule 27 (expressao)
+
+
+State 29
+
+   28 expressao: CONSTANTE_REAL •
+
+    $default  reduce using rule 28 (expressao)
+
+
+State 30
+
+   29 expressao: VARIAVEL •
+
+    $default  reduce using rule 29 (expressao)
+
+
+State 31
+
+   17 condicao: SE expressao • ENTAO comandos FIM_SE
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    ENTAO      shift, and go to state 43
+    ADICAO     shift, and go to state 44
+    DIVISAO    shift, and go to state 45
+    PRODUTO    shift, and go to state 46
+    SUBTRACAO  shift, and go to state 47
+    IGUAL      shift, and go to state 48
+    MAIOR      shift, and go to state 49
+
+
+State 32
+
+   18 repeticao: ENQUANTO expressao • comandos FIM_ENQUANTO
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    SE         shift, and go to state 13
+    ENQUANTO   shift, and go to state 14
+    ESCREVA    shift, and go to state 15
+    LEIA       shift, and go to state 16
+    ADICAO     shift, and go to state 44
+    DIVISAO    shift, and go to state 45
+    PRODUTO    shift, and go to state 46
+    SUBTRACAO  shift, and go to state 47
+    IGUAL      shift, and go to state 48
+    MAIOR      shift, and go to state 49
+    VARIAVEL   shift, and go to state 17
+
+    comandos    go to state 50
+    comando     go to state 20
+    condicao    go to state 21
+    repeticao   go to state 22
+    atribuicao  go to state 23
+    escrita     go to state 24
+    leitura     go to state 25
+
+
+State 33
+
+   20 escrita: ESCREVA ABRE_PARENTESE • lista_argumentos FECHA_PARENTESE
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+    CADEIA             shift, and go to state 34
+
+    lista_argumentos  go to state 51
+    expressao         go to state 36
+
+
+State 34
+
+   23 lista_argumentos: CADEIA •
+
+    $default  reduce using rule 23 (lista_argumentos)
+
+
+State 35
+
+   21 escrita: ESCREVA lista_argumentos •
+   24 lista_argumentos: lista_argumentos • VIRGULA expressao
+
+    VIRGULA  shift, and go to state 52
+
+    $default  reduce using rule 21 (escrita)
+
+
+State 36
+
+   22 lista_argumentos: expressao •
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    ADICAO     shift, and go to state 44
+    DIVISAO    shift, and go to state 45
+    PRODUTO    shift, and go to state 46
+    SUBTRACAO  shift, and go to state 47
+    IGUAL      shift, and go to state 48
+    MAIOR      shift, and go to state 49
+
+    $default  reduce using rule 22 (lista_argumentos)
+
+
+State 37
+
+   25 leitura: LEIA ABRE_PARENTESE • VARIAVEL FECHA_PARENTESE
+
+    VARIAVEL  shift, and go to state 53
+
+
+State 38
+
+   26 leitura: LEIA VARIAVEL •
+
+    $default  reduce using rule 26 (leitura)
+
+
+State 39
+
+   19 atribuicao: VARIAVEL ATRIBUICAO • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 54
+
+
+State 40
+
+    4 declaracoes: declaracoes tipo lista_variaveis •
+    9 lista_variaveis: lista_variaveis • VIRGULA VARIAVEL
+
+    VIRGULA  shift, and go to state 42
+
+    $default  reduce using rule 4 (declaracoes)
+
+
+State 41
+
+   11 comandos: comandos comando •
+
+    $default  reduce using rule 11 (comandos)
+
+
+State 42
+
+    9 lista_variaveis: lista_variaveis VIRGULA • VARIAVEL
+
+    VARIAVEL  shift, and go to state 55
+
+
+State 43
+
+   17 condicao: SE expressao ENTAO • comandos FIM_SE
+
+    SE        shift, and go to state 13
+    ENQUANTO  shift, and go to state 14
+    ESCREVA   shift, and go to state 15
+    LEIA      shift, and go to state 16
+    VARIAVEL  shift, and go to state 17
+
+    comandos    go to state 56
+    comando     go to state 20
+    condicao    go to state 21
+    repeticao   go to state 22
+    atribuicao  go to state 23
+    escrita     go to state 24
+    leitura     go to state 25
+
+
+State 44
+
+   30 expressao: expressao ADICAO • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 57
+
+
+State 45
+
+   33 expressao: expressao DIVISAO • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 58
+
+
+State 46
+
+   32 expressao: expressao PRODUTO • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 59
+
+
+State 47
+
+   31 expressao: expressao SUBTRACAO • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 60
+
+
+State 48
+
+   34 expressao: expressao IGUAL • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 61
+
+
+State 49
+
+   35 expressao: expressao MAIOR • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 62
+
+
+State 50
+
+   11 comandos: comandos • comando
+   18 repeticao: ENQUANTO expressao comandos • FIM_ENQUANTO
+
+    SE            shift, and go to state 13
+    ENQUANTO      shift, and go to state 14
+    ESCREVA       shift, and go to state 15
+    FIM_ENQUANTO  shift, and go to state 63
+    LEIA          shift, and go to state 16
+    VARIAVEL      shift, and go to state 17
+
+    comando     go to state 41
+    condicao    go to state 21
+    repeticao   go to state 22
+    atribuicao  go to state 23
+    escrita     go to state 24
+    leitura     go to state 25
+
+
+State 51
+
+   20 escrita: ESCREVA ABRE_PARENTESE lista_argumentos • FECHA_PARENTESE
+   24 lista_argumentos: lista_argumentos • VIRGULA expressao
+
+    FECHA_PARENTESE  shift, and go to state 64
+    VIRGULA          shift, and go to state 52
+
+
+State 52
+
+   24 lista_argumentos: lista_argumentos VIRGULA • expressao
+
+    CONSTANTE_INTEIRA  shift, and go to state 28
+    CONSTANTE_REAL     shift, and go to state 29
+    VARIAVEL           shift, and go to state 30
+
+    expressao  go to state 65
+
+
+State 53
+
+   25 leitura: LEIA ABRE_PARENTESE VARIAVEL • FECHA_PARENTESE
+
+    FECHA_PARENTESE  shift, and go to state 66
+
+
+State 54
+
+   19 atribuicao: VARIAVEL ATRIBUICAO expressao •
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    ADICAO     shift, and go to state 44
+    DIVISAO    shift, and go to state 45
+    PRODUTO    shift, and go to state 46
+    SUBTRACAO  shift, and go to state 47
+    IGUAL      shift, and go to state 48
+    MAIOR      shift, and go to state 49
+
+    $default  reduce using rule 19 (atribuicao)
+
+
+State 55
+
+    9 lista_variaveis: lista_variaveis VIRGULA VARIAVEL •
+
+    $default  reduce using rule 9 (lista_variaveis)
+
+
+State 56
+
+   11 comandos: comandos • comando
+   17 condicao: SE expressao ENTAO comandos • FIM_SE
+
+    SE        shift, and go to state 13
+    ENQUANTO  shift, and go to state 14
+    ESCREVA   shift, and go to state 15
+    FIM_SE    shift, and go to state 67
+    LEIA      shift, and go to state 16
+    VARIAVEL  shift, and go to state 17
+
+    comando     go to state 41
+    condicao    go to state 21
+    repeticao   go to state 22
+    atribuicao  go to state 23
+    escrita     go to state 24
+    leitura     go to state 25
+
+
+State 57
+
+   30 expressao: expressao • ADICAO expressao
+   30          | expressao ADICAO expressao •
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    DIVISAO  shift, and go to state 45
+    PRODUTO  shift, and go to state 46
+
+    $default  reduce using rule 30 (expressao)
+
+
+State 58
+
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   33          | expressao DIVISAO expressao •
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    $default  reduce using rule 33 (expressao)
+
+
+State 59
+
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   32          | expressao PRODUTO expressao •
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    $default  reduce using rule 32 (expressao)
+
+
+State 60
+
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   31          | expressao SUBTRACAO expressao •
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    DIVISAO  shift, and go to state 45
+    PRODUTO  shift, and go to state 46
+
+    $default  reduce using rule 31 (expressao)
+
+
+State 61
+
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   34          | expressao IGUAL expressao •
+   35          | expressao • MAIOR expressao
+
+    ADICAO     shift, and go to state 44
+    DIVISAO    shift, and go to state 45
+    PRODUTO    shift, and go to state 46
+    SUBTRACAO  shift, and go to state 47
+
+    $default  reduce using rule 34 (expressao)
+
+
+State 62
+
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+   35          | expressao MAIOR expressao •
+
+    ADICAO     shift, and go to state 44
+    DIVISAO    shift, and go to state 45
+    PRODUTO    shift, and go to state 46
+    SUBTRACAO  shift, and go to state 47
+
+    $default  reduce using rule 35 (expressao)
+
+
+State 63
+
+   18 repeticao: ENQUANTO expressao comandos FIM_ENQUANTO •
+
+    $default  reduce using rule 18 (repeticao)
+
+
+State 64
+
+   20 escrita: ESCREVA ABRE_PARENTESE lista_argumentos FECHA_PARENTESE •
+
+    $default  reduce using rule 20 (escrita)
+
+
+State 65
+
+   24 lista_argumentos: lista_argumentos VIRGULA expressao •
+   30 expressao: expressao • ADICAO expressao
+   31          | expressao • SUBTRACAO expressao
+   32          | expressao • PRODUTO expressao
+   33          | expressao • DIVISAO expressao
+   34          | expressao • IGUAL expressao
+   35          | expressao • MAIOR expressao
+
+    ADICAO     shift, and go to state 44
+    DIVISAO    shift, and go to state 45
+    PRODUTO    shift, and go to state 46
+    SUBTRACAO  shift, and go to state 47
+    IGUAL      shift, and go to state 48
+    MAIOR      shift, and go to state 49
+
+    $default  reduce using rule 24 (lista_argumentos)
+
+
+State 66
+
+   25 leitura: LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE •
+
+    $default  reduce using rule 25 (leitura)
+
+
+State 67
+
+   17 condicao: SE expressao ENTAO comandos FIM_SE •
+
+    $default  reduce using rule 17 (condicao)
