@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "tabela.h"
 %}
 
 /* Definições de Tokens */
@@ -13,7 +14,7 @@ CONSTANTE_INTEIRA       {NUMERO}
 CONSTANTE_REAL          {NUMERO}"."{NUMERO}+
 ALFABETO                [a-zA-Z]
 VARIAVEL                {ALFABETO}({ALFABETO}|{NUMERO}|_)*
-CADEIA                  \'[^\']+\'
+CADEIA                  (\'[^\']+\')|(\"[^\"]+\")
 COMENTARIOS             \{[^}]*\}
 ESPACOS                 [ \t\n]+
 
@@ -31,6 +32,7 @@ ESPACOS                 [ \t\n]+
 "LEIA"                  { printf("Token: LEIA\n"); return LEIA; }
 "+"                     { printf("Token: ADICAO\n"); return ADICAO; }
 ":="                    { printf("Token: ATRIBUICAO\n"); return ATRIBUICAO; }
+"="                    { printf("Token: ATRIBUICAO\n"); return ATRIBUICAO; }
 "/"                     { printf("Token: DIVISAO\n"); return DIVISAO; }
 "*"                     { printf("Token: PRODUTO\n"); return PRODUTO; }
 "-"                     { printf("Token: SUBTRACAO\n"); return SUBTRACAO; }
@@ -47,9 +49,24 @@ ESPACOS                 [ \t\n]+
 "]"                     { printf("Token: FECHA_COLCHETE\n"); return FECHA_COLCHETE; }
 ","                     { printf("Token: VIRGULA\n"); return VIRGULA; }                     
 
-{CONSTANTE_INTEIRA}     { printf("Token: CONSTANTE_INTEIRA (%s)\n", yytext); return CONSTANTE_INTEIRA; }
-{CONSTANTE_REAL}        { printf("Token: CONSTANTE_REAL (%s)\n", yytext); return CONSTANTE_REAL; }
-{VARIAVEL}              { printf("Token: VARIAVEL (%s)\n", yytext); return VARIAVEL; }
+{VARIAVEL} {
+    yylval.string = strdup(yytext);
+    printf("Token: VARIAVEL (%s)\n", yytext);
+    return VARIAVEL;
+}
+
+{CONSTANTE_INTEIRA} {
+    yylval.inteiro = atoi(yytext);
+    printf("Token: CONSTANTE_INTEIRA (%s)\n", yytext);
+    return CONSTANTE_INTEIRA;
+}
+
+{CONSTANTE_REAL} {
+    yylval.real = atof(yytext);
+    printf("Token: CONSTANTE_REAL (%s)\n", yytext);
+    return CONSTANTE_REAL;
+}
+
 {CADEIA}                { printf("Token: CADEIA (%s)\n", yytext); return CADEIA; }
 {COMENTARIOS}           { /* Ignora comentários */ }
 {ESPACOS}               { /* Ignora espaços em branco */ }

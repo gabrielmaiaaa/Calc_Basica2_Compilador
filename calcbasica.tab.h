@@ -94,14 +94,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 85 "calcbasica.y"
+#line 22 "calcbasica.y"
 
     int inteiro;
     float real;
-    char caracter;
     char *string;
 
-#line 105 "calcbasica.tab.h"
+#line 104 "calcbasica.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

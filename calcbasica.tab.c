@@ -72,86 +72,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define TABLE_SIZE 100
-
-// Definindo os tipos possíveis de variáveis
-typedef enum { INTEIRO, REAL, CARACTER, LISTA_INT, LISTA_REAL } TipoVariavel;
-
-// União para armazenar os valores das variáveis
-typedef union {
-    int inteiro;
-    float real;
-    char caracter;
-} ValorVariavel;
-
-// Estrutura para representar uma entrada na tabela de símbolos
-typedef struct EntradaSimbolo {
-    char nome[50];
-    TipoVariavel tipo;
-    ValorVariavel valor;
-    struct EntradaSimbolo *next;
-} EntradaSimbolo;
-
-// Função de hash para a tabela de símbolos
-unsigned int hash(char *nome) {
-    unsigned int h = 0;
-    for (int i = 0; nome[i] != '\0'; i++) {
-        h = (h * 31) + nome[i];
-    }
-    return h % TABLE_SIZE;
-}
-
-// Estrutura da tabela de símbolos
-EntradaSimbolo *tabelaSimbolos[TABLE_SIZE];
-
-// Função para inicializar a tabela de símbolos
-void inicializaTabela() {
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        tabelaSimbolos[i] = NULL;
-    }
-}
-
-// Função para adicionar uma variável à tabela de símbolos
-void adicionaSimbolo(char *nome, TipoVariavel tipo) {
-    unsigned int index = hash(nome);
-    EntradaSimbolo *novo = (EntradaSimbolo *)malloc(sizeof(EntradaSimbolo));
-    strcpy(novo->nome, nome);
-    novo->tipo = tipo;
-    novo->next = tabelaSimbolos[index];
-    tabelaSimbolos[index] = novo;
-}
-
-// Função para buscar uma variável na tabela de símbolos
-EntradaSimbolo *buscaSimbolo(char *nome) {
-    unsigned int index = hash(nome);
-    EntradaSimbolo *entry = tabelaSimbolos[index];
-    while (entry != NULL) {
-        if (strcmp(entry->nome, nome) == 0) {
-            return entry;
-        }
-        entry = entry->next;
-    }
-    return NULL;
-}
-
-// Função para imprimir a tabela de símbolos
-void imprimeTabela() {
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        EntradaSimbolo *entry = tabelaSimbolos[i];
-        while (entry != NULL) {
-            printf("Nome: %s, Tipo: %d\n", entry->nome, entry->tipo);
-            entry = entry->next;
-        }
-    }
-}
-
+#include "tabela.h"
 
 void yyerror(const char *s);
 int yylex(void);
 extern FILE *yyin;
 
-#line 155 "calcbasica.tab.c"
+// Tabela de símbolos
+TabelaSimbolos tabela;
+
+// Tipo atual para as declarações
+char *tipoAtual;
+
+// Funções auxiliares para lidar com declarações e comandos
+void processaDeclaracao(char *nome);
+void processaAtribuicao(char *var, char *valor);
+
+#line 92 "calcbasica.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -618,11 +555,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   110,   110,   114,   118,   124,   129,   130,   131,   132,
-     133,   137,   145,   157,   158,   162,   163,   164,   165,   166,
-     167,   171,   175,   179,   183,   198,   199,   203,   204,   205,
-     209,   210,   214,   217,   220,   229,   236,   237,   238,   239,
-     240
+       0,    46,    46,    53,    57,    58,    62,    63,    64,    65,
+      66,    70,    74,    81,    82,    86,    87,    88,    89,    90,
+      91,    95,    99,   103,   107,   113,   114,   118,   119,   120,
+     124,   125,   129,   130,   131,   132,   133,   134,   135,   136,
+     137
 };
 #endif
 
@@ -1242,139 +1179,72 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* programa: PROGRAMA VARIAVEL bloco FIM  */
-#line 110 "calcbasica.y"
-                                 { printf("Programa válido!\n"); }
-#line 1248 "calcbasica.tab.c"
-    break;
-
-  case 4: /* declaracoes: tipo lista_variaveis  */
-#line 118 "calcbasica.y"
-                         {
-        char *listaVariaveis[(yyvsp[0].inteiro)]; // Aloca espaço para armazenar os nomes das variáveis
-        for (int i = 0; i < (yyvsp[0].inteiro); i++) {
-            adicionaSimbolo(listaVariaveis[i], (yyvsp[-1].inteiro)); // Passa o tipo e o nome
+#line 46 "calcbasica.y"
+                                 { 
+        printf("Programa válido!\n");
+        exibeTabela(&tabela); 
         }
-    }
-#line 1259 "calcbasica.tab.c"
+#line 1188 "calcbasica.tab.c"
     break;
 
   case 6: /* tipo: TIPO_INTEIRO  */
-#line 129 "calcbasica.y"
-                 { (yyval.inteiro) = INTEIRO; }
-#line 1265 "calcbasica.tab.c"
+#line 62 "calcbasica.y"
+                    { tipoAtual = "INTEIRO"; }
+#line 1194 "calcbasica.tab.c"
     break;
 
   case 7: /* tipo: TIPO_REAL  */
-#line 130 "calcbasica.y"
-                { (yyval.inteiro) = REAL; }
-#line 1271 "calcbasica.tab.c"
+#line 63 "calcbasica.y"
+                    { tipoAtual = "REAL"; }
+#line 1200 "calcbasica.tab.c"
     break;
 
   case 8: /* tipo: TIPO_CARACTER  */
-#line 131 "calcbasica.y"
-                    { (yyval.inteiro) = CARACTER; }
-#line 1277 "calcbasica.tab.c"
+#line 64 "calcbasica.y"
+                    { tipoAtual = "CARACTER"; }
+#line 1206 "calcbasica.tab.c"
     break;
 
   case 9: /* tipo: TIPO_LISTA_INT  */
-#line 132 "calcbasica.y"
-                     { (yyval.inteiro) = LISTA_INT; }
-#line 1283 "calcbasica.tab.c"
+#line 65 "calcbasica.y"
+                     { tipoAtual = "LISTA_INT"; }
+#line 1212 "calcbasica.tab.c"
     break;
 
   case 10: /* tipo: TIPO_LISTA_REAL  */
-#line 133 "calcbasica.y"
-                      { (yyval.inteiro) = LISTA_REAL; }
-#line 1289 "calcbasica.tab.c"
+#line 66 "calcbasica.y"
+                      { tipoAtual = "LISTA_REAL"; }
+#line 1218 "calcbasica.tab.c"
     break;
 
   case 11: /* lista_variaveis: VARIAVEL  */
-#line 137 "calcbasica.y"
+#line 70 "calcbasica.y"
              {
-        (yyval.inteiro) = 1; // Uma variável foi processada
-        if (buscaSimbolo((yyvsp[0].string)) != NULL) {
-            yyerror("Variável já declarada");
-        } else {
-            adicionaSimbolo((yyvsp[0].string), (yyvsp[-1].inteiro)); // Aqui $<inteiro>0 é o tipo propagado
-        }
+        printf("AAA %s\n", yylval.string);
+        processaDeclaracao(yylval.string);
     }
-#line 1302 "calcbasica.tab.c"
+#line 1227 "calcbasica.tab.c"
     break;
 
   case 12: /* lista_variaveis: lista_variaveis VIRGULA VARIAVEL  */
-#line 145 "calcbasica.y"
+#line 74 "calcbasica.y"
                                        {
-        (yyval.inteiro) = (yyvsp[-2].inteiro) + 1; // Incrementa o contador de variáveis
-        if (buscaSimbolo((yyvsp[0].string)) != NULL) {
-            yyerror("Variável já declarada");
-        } else {
-            adicionaSimbolo((yyvsp[0].string), (yyvsp[-3].inteiro)); // Usa o tipo propagado
-        }
+        printf("AAA %s\n", yylval.string);
+        processaDeclaracao(yylval.string);
     }
-#line 1315 "calcbasica.tab.c"
+#line 1236 "calcbasica.tab.c"
     break;
 
   case 24: /* atribuicao: VARIAVEL ATRIBUICAO expressao  */
-#line 183 "calcbasica.y"
+#line 107 "calcbasica.y"
                                   {
-        // Verifique se a variável foi declarada
-        EntradaSimbolo *entry = buscaSimbolo((yyvsp[-2].string));
-        if (entry == NULL) {
-            yyerror("Variável não declarada");
-        } else {
-            // Verifique se os tipos são compatíveis entre o tipo da variável e o tipo da expressão
-            if (entry->tipo != (yyvsp[0].inteiro)) {
-                yyerror("Tipos incompatíveis na atribuição");
-            }
-        }
+        processaAtribuicao(yylval.string, "expressao");
     }
-#line 1332 "calcbasica.tab.c"
-    break;
-
-  case 32: /* expressao: CONSTANTE_INTEIRA  */
-#line 214 "calcbasica.y"
-                      {
-        (yyval.inteiro) = INTEIRO;
-    }
-#line 1340 "calcbasica.tab.c"
-    break;
-
-  case 33: /* expressao: CONSTANTE_REAL  */
-#line 217 "calcbasica.y"
-                     {
-        (yyval.inteiro) = REAL;
-    }
-#line 1348 "calcbasica.tab.c"
-    break;
-
-  case 34: /* expressao: VARIAVEL  */
-#line 220 "calcbasica.y"
-               {
-        // Verifique se a variável foi declarada
-        EntradaSimbolo *entry = buscaSimbolo((yyvsp[0].string));
-        if (entry == NULL) {
-            yyerror("Variável não declarada");
-        } else {
-            (yyval.inteiro) = entry->tipo; // Atribui o tipo da variável
-        }
-    }
-#line 1362 "calcbasica.tab.c"
-    break;
-
-  case 35: /* expressao: expressao PRODUTO expressao  */
-#line 229 "calcbasica.y"
-                                  {
-        // Verifique a compatibilidade dos tipos
-        if ((yyvsp[-2].inteiro) != (yyvsp[0].inteiro)) {
-            yyerror("Tipos incompatíveis no produto");
-        }
-        (yyval.inteiro) = (yyvsp[-2].inteiro); // O tipo da expressão do produto será o tipo de $1
-    }
-#line 1374 "calcbasica.tab.c"
+#line 1244 "calcbasica.tab.c"
     break;
 
 
-#line 1378 "calcbasica.tab.c"
+#line 1248 "calcbasica.tab.c"
 
       default: break;
     }
@@ -1567,7 +1437,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 244 "calcbasica.y"
+#line 141 "calcbasica.y"
 
 
 void yyerror(const char *s) {
@@ -1586,9 +1456,22 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    inicializaTabela();
     yyparse();
     fclose(yyin);
-    imprimeTabela(); // Para ver os símbolos na tabela
     return 0;
+}
+
+/* Funções auxiliares */
+
+void processaDeclaracao(char *nome) {
+    adicionaSimbolo(&tabela, nome, tipoAtual);
+}
+
+
+void processaAtribuicao(char *var, char *valor) {
+    if (!buscaSimbolo(&tabela, var)) {
+        fprintf(stderr, "Erro: Variável '%s' não declarada.\n", var);
+    } else {
+        printf("Atribuição: %s := %s\n", var, valor);
+    }
 }
