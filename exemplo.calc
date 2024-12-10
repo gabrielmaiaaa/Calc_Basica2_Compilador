@@ -1,17 +1,25 @@
-PROGRAMA fatorial_exemplo
+PROGRAMA leitura_de_lista
 INICIO
-    { DECLARACOES }
-    INTEIRO arg, fat
-    { ALGORITMO }
-    { Calcula o fatorial de um número inteiro }
-    LEIA arg
-    fat := arg
-    SE arg .I. 0
-        ENTAO fat := 1
-    FIM_SE
-    ENQUANTO arg .M. 1
-        fat := fat * arg
-        arg := arg - 1
-    FIM_ENQUANTO
-    ESCREVA 'fatorial = ', fat
+{DECLARACOES }
+INTEIRO num, i1, k2, x3
+LISTA_INT Vet[100]
+{ALGORITMO}
+ {armazena os dados da lista}
+ESCREVA 'quantos números vai armazenar?'
+LEIA num
+x3 := 0
+k2 := 1
+ENQUANTO num .M. k2
+ LEIA Vet[k2]
+ x3 := x3 + A[k2]
+ k2 := k2 + 1
+FIM_ENQUANTO
+ {escreve a lista de numeros}
+ESCREVA 'Numeros armazenados: '
+k2 := 1
+ENQUANTO num .M. k2
+ ESCREVA A[k2]
+ k2 := k2+1
+FIM_ENQUANTO
+ESCREVA ' soma dos valores armazenados = ' , x3
 FIM

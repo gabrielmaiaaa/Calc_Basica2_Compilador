@@ -8,7 +8,7 @@ extern FILE *yyin;
 %}
 
 /* Declaração dos tokens */
-%token PROGRAMA SE ENQUANTO ENTAO ESCREVA FIM_SE FIM_ENQUANTO FIM INICIO LEIA
+%token PROGRAMA SE ENQUANTO ENTAO ESCREVA FIM_SE FIM_ENQUANTO FIM INICIO LEIA ALFABETO
 %token ADICAO ATRIBUICAO DIVISAO PRODUTO SUBTRACAO IGUAL MAIOR
 %token TIPO_CARACTER TIPO_INTEIRO TIPO_LISTA_INT TIPO_LISTA_REAL TIPO_REAL
 %token ABRE_PARENTESE FECHA_PARENTESE ABRE_COLCHETE FECHA_COLCHETE VIRGULA
@@ -23,7 +23,7 @@ y
 %%
 
 programa:
-    PROGRAMA VARIAVEL bloco FIM { printf("Programa válido!\n"); }
+    PROGRAMA VARIAVEL bloco  FIM { printf("Programa válido!\n"); }
     ;
 
 bloco:
@@ -39,6 +39,8 @@ tipo:
     TIPO_INTEIRO
     | TIPO_REAL
     | TIPO_CARACTER
+    | TIPO_LISTA_INT
+    | TIPO_LISTA_REAL
     ;
 
 lista_variaveis:
@@ -57,6 +59,11 @@ comando:
     | leitura
     | condicao
     | repeticao
+    | acesso_lista
+    ;
+
+acesso_lista:
+    ABRE_COLCHETE expressao FECHA_COLCHETE
     ;
 
 condicao:
@@ -68,7 +75,7 @@ repeticao:
     ;
 
 atribuicao:
-    VARIAVEL ATRIBUICAO expressao { printf("Atribuição.\n"); }
+    VARIAVEL ATRIBUICAO expressao
     ;
 
 escrita:
@@ -83,7 +90,7 @@ lista_argumentos:
     ;
 
 leitura:
-    LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE { printf("Leitura.\n"); }
+    LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE
     | LEIA VARIAVEL
     ;
 
@@ -91,10 +98,10 @@ expressao:
     CONSTANTE_INTEIRA
     | CONSTANTE_REAL
     | VARIAVEL
-    | expressao ADICAO expressao
-    | expressao SUBTRACAO expressao
     | expressao PRODUTO expressao
     | expressao DIVISAO expressao
+    | expressao ADICAO expressao
+    | expressao SUBTRACAO expressao
     | expressao IGUAL expressao
     | expressao MAIOR expressao
     ;
