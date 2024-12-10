@@ -71,12 +71,87 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define TABLE_SIZE 100
+
+// Definindo os tipos possíveis de variáveis
+typedef enum { INTEIRO, REAL, CARACTER, LISTA_INT, LISTA_REAL } TipoVariavel;
+
+// União para armazenar os valores das variáveis
+typedef union {
+    int inteiro;
+    float real;
+    char caracter;
+} ValorVariavel;
+
+// Estrutura para representar uma entrada na tabela de símbolos
+typedef struct EntradaSimbolo {
+    char nome[50];
+    TipoVariavel tipo;
+    ValorVariavel valor;
+    struct EntradaSimbolo *next;
+} EntradaSimbolo;
+
+// Função de hash para a tabela de símbolos
+unsigned int hash(char *nome) {
+    unsigned int h = 0;
+    for (int i = 0; nome[i] != '\0'; i++) {
+        h = (h * 31) + nome[i];
+    }
+    return h % TABLE_SIZE;
+}
+
+// Estrutura da tabela de símbolos
+EntradaSimbolo *tabelaSimbolos[TABLE_SIZE];
+
+// Função para inicializar a tabela de símbolos
+void inicializaTabela() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        tabelaSimbolos[i] = NULL;
+    }
+}
+
+// Função para adicionar uma variável à tabela de símbolos
+void adicionaSimbolo(char *nome, TipoVariavel tipo) {
+    unsigned int index = hash(nome);
+    EntradaSimbolo *novo = (EntradaSimbolo *)malloc(sizeof(EntradaSimbolo));
+    strcpy(novo->nome, nome);
+    novo->tipo = tipo;
+    novo->next = tabelaSimbolos[index];
+    tabelaSimbolos[index] = novo;
+}
+
+// Função para buscar uma variável na tabela de símbolos
+EntradaSimbolo *buscaSimbolo(char *nome) {
+    unsigned int index = hash(nome);
+    EntradaSimbolo *entry = tabelaSimbolos[index];
+    while (entry != NULL) {
+        if (strcmp(entry->nome, nome) == 0) {
+            return entry;
+        }
+        entry = entry->next;
+    }
+    return NULL;
+}
+
+// Função para imprimir a tabela de símbolos
+void imprimeTabela() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        EntradaSimbolo *entry = tabelaSimbolos[i];
+        while (entry != NULL) {
+            printf("Nome: %s, Tipo: %d\n", entry->nome, entry->tipo);
+            entry = entry->next;
+        }
+    }
+}
+
 
 void yyerror(const char *s);
 int yylex(void);
 extern FILE *yyin;
 
-#line 80 "calcbasica.tab.c"
+#line 155 "calcbasica.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -139,23 +214,22 @@ enum yysymbol_kind_t
   YYSYMBOL_CONSTANTE_REAL = 32,            /* CONSTANTE_REAL  */
   YYSYMBOL_VARIAVEL = 33,                  /* VARIAVEL  */
   YYSYMBOL_CADEIA = 34,                    /* CADEIA  */
-  YYSYMBOL_y = 35,                         /* y  */
-  YYSYMBOL_YYACCEPT = 36,                  /* $accept  */
-  YYSYMBOL_programa = 37,                  /* programa  */
-  YYSYMBOL_bloco = 38,                     /* bloco  */
-  YYSYMBOL_declaracoes = 39,               /* declaracoes  */
-  YYSYMBOL_tipo = 40,                      /* tipo  */
-  YYSYMBOL_lista_variaveis = 41,           /* lista_variaveis  */
-  YYSYMBOL_comandos = 42,                  /* comandos  */
-  YYSYMBOL_comando = 43,                   /* comando  */
-  YYSYMBOL_acesso_lista = 44,              /* acesso_lista  */
-  YYSYMBOL_condicao = 45,                  /* condicao  */
-  YYSYMBOL_repeticao = 46,                 /* repeticao  */
-  YYSYMBOL_atribuicao = 47,                /* atribuicao  */
-  YYSYMBOL_escrita = 48,                   /* escrita  */
-  YYSYMBOL_lista_argumentos = 49,          /* lista_argumentos  */
-  YYSYMBOL_leitura = 50,                   /* leitura  */
-  YYSYMBOL_expressao = 51                  /* expressao  */
+  YYSYMBOL_YYACCEPT = 35,                  /* $accept  */
+  YYSYMBOL_programa = 36,                  /* programa  */
+  YYSYMBOL_bloco = 37,                     /* bloco  */
+  YYSYMBOL_declaracoes = 38,               /* declaracoes  */
+  YYSYMBOL_tipo = 39,                      /* tipo  */
+  YYSYMBOL_lista_variaveis = 40,           /* lista_variaveis  */
+  YYSYMBOL_comandos = 41,                  /* comandos  */
+  YYSYMBOL_comando = 42,                   /* comando  */
+  YYSYMBOL_acesso_lista = 43,              /* acesso_lista  */
+  YYSYMBOL_condicao = 44,                  /* condicao  */
+  YYSYMBOL_repeticao = 45,                 /* repeticao  */
+  YYSYMBOL_atribuicao = 46,                /* atribuicao  */
+  YYSYMBOL_escrita = 47,                   /* escrita  */
+  YYSYMBOL_lista_argumentos = 48,          /* lista_argumentos  */
+  YYSYMBOL_leitura = 49,                   /* leitura  */
+  YYSYMBOL_expressao = 50                  /* expressao  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -486,7 +560,7 @@ union yyalloc
 #define YYLAST   124
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  36
+#define YYNTOKENS  35
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  16
 /* YYNRULES -- Number of rules.  */
@@ -495,7 +569,7 @@ union yyalloc
 #define YYNSTATES  74
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   290
+#define YYMAXUTOK   289
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -537,19 +611,18 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    26,    26,    30,    34,    35,    39,    40,    41,    42,
-      43,    47,    48,    52,    53,    57,    58,    59,    60,    61,
-      62,    66,    70,    74,    78,    82,    83,    87,    88,    89,
-      93,    94,    98,    99,   100,   101,   102,   103,   104,   105,
-     106
+       0,   110,   110,   114,   118,   124,   129,   130,   131,   132,
+     133,   137,   145,   157,   158,   162,   163,   164,   165,   166,
+     167,   171,   175,   179,   183,   198,   199,   203,   204,   205,
+     209,   210,   214,   217,   220,   229,   236,   237,   238,   239,
+     240
 };
 #endif
 
@@ -572,10 +645,9 @@ static const char *const yytname[] =
   "TIPO_INTEIRO", "TIPO_LISTA_INT", "TIPO_LISTA_REAL", "TIPO_REAL",
   "ABRE_PARENTESE", "FECHA_PARENTESE", "ABRE_COLCHETE", "FECHA_COLCHETE",
   "VIRGULA", "CONSTANTE_INTEIRA", "CONSTANTE_REAL", "VARIAVEL", "CADEIA",
-  "y", "$accept", "programa", "bloco", "declaracoes", "tipo",
-  "lista_variaveis", "comandos", "comando", "acesso_lista", "condicao",
-  "repeticao", "atribuicao", "escrita", "lista_argumentos", "leitura",
-  "expressao", YY_NULLPTR
+  "$accept", "programa", "bloco", "declaracoes", "tipo", "lista_variaveis",
+  "comandos", "comando", "acesso_lista", "condicao", "repeticao",
+  "atribuicao", "escrita", "lista_argumentos", "leitura", "expressao", YY_NULLPTR
 };
 
 static const char *
@@ -679,24 +751,24 @@ static const yytype_int8 yycheck[] =
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    37,    33,     0,    11,    38,    21,    22,    23,
-      24,    25,    39,    40,    10,     4,     5,     7,    12,    28,
-      33,    40,    42,    43,    44,    45,    46,    47,    48,    50,
-      33,    41,    31,    32,    33,    51,    51,    26,    34,    49,
-      51,    26,    33,    51,    15,    41,    43,    30,     6,    14,
-      16,    17,    18,    19,    20,    42,    49,    30,    33,    29,
-      51,    33,    42,    51,    51,    51,    51,    51,    51,     9,
-      27,    51,    27,     8
+       0,     3,    36,    33,     0,    11,    37,    21,    22,    23,
+      24,    25,    38,    39,    10,     4,     5,     7,    12,    28,
+      33,    39,    41,    42,    43,    44,    45,    46,    47,    49,
+      33,    40,    31,    32,    33,    50,    50,    26,    34,    48,
+      50,    26,    33,    50,    15,    40,    42,    30,     6,    14,
+      16,    17,    18,    19,    20,    41,    48,    30,    33,    29,
+      50,    33,    41,    50,    50,    50,    50,    50,    50,     9,
+      27,    50,    27,     8
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    36,    37,    38,    39,    39,    40,    40,    40,    40,
-      40,    41,    41,    42,    42,    43,    43,    43,    43,    43,
-      43,    44,    45,    46,    47,    48,    48,    49,    49,    49,
-      50,    50,    51,    51,    51,    51,    51,    51,    51,    51,
-      51
+       0,    35,    36,    37,    38,    38,    39,    39,    39,    39,
+      39,    40,    40,    41,    41,    42,    42,    42,    42,    42,
+      42,    43,    44,    45,    46,    47,    47,    48,    48,    48,
+      49,    49,    50,    50,    50,    50,    50,    50,    50,    50,
+      50
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -1170,13 +1242,139 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* programa: PROGRAMA VARIAVEL bloco FIM  */
-#line 26 "calcbasica.y"
+#line 110 "calcbasica.y"
                                  { printf("Programa válido!\n"); }
-#line 1176 "calcbasica.tab.c"
+#line 1248 "calcbasica.tab.c"
+    break;
+
+  case 4: /* declaracoes: tipo lista_variaveis  */
+#line 118 "calcbasica.y"
+                         {
+        char *listaVariaveis[(yyvsp[0].inteiro)]; // Aloca espaço para armazenar os nomes das variáveis
+        for (int i = 0; i < (yyvsp[0].inteiro); i++) {
+            adicionaSimbolo(listaVariaveis[i], (yyvsp[-1].inteiro)); // Passa o tipo e o nome
+        }
+    }
+#line 1259 "calcbasica.tab.c"
+    break;
+
+  case 6: /* tipo: TIPO_INTEIRO  */
+#line 129 "calcbasica.y"
+                 { (yyval.inteiro) = INTEIRO; }
+#line 1265 "calcbasica.tab.c"
+    break;
+
+  case 7: /* tipo: TIPO_REAL  */
+#line 130 "calcbasica.y"
+                { (yyval.inteiro) = REAL; }
+#line 1271 "calcbasica.tab.c"
+    break;
+
+  case 8: /* tipo: TIPO_CARACTER  */
+#line 131 "calcbasica.y"
+                    { (yyval.inteiro) = CARACTER; }
+#line 1277 "calcbasica.tab.c"
+    break;
+
+  case 9: /* tipo: TIPO_LISTA_INT  */
+#line 132 "calcbasica.y"
+                     { (yyval.inteiro) = LISTA_INT; }
+#line 1283 "calcbasica.tab.c"
+    break;
+
+  case 10: /* tipo: TIPO_LISTA_REAL  */
+#line 133 "calcbasica.y"
+                      { (yyval.inteiro) = LISTA_REAL; }
+#line 1289 "calcbasica.tab.c"
+    break;
+
+  case 11: /* lista_variaveis: VARIAVEL  */
+#line 137 "calcbasica.y"
+             {
+        (yyval.inteiro) = 1; // Uma variável foi processada
+        if (buscaSimbolo((yyvsp[0].string)) != NULL) {
+            yyerror("Variável já declarada");
+        } else {
+            adicionaSimbolo((yyvsp[0].string), (yyvsp[-1].inteiro)); // Aqui $<inteiro>0 é o tipo propagado
+        }
+    }
+#line 1302 "calcbasica.tab.c"
+    break;
+
+  case 12: /* lista_variaveis: lista_variaveis VIRGULA VARIAVEL  */
+#line 145 "calcbasica.y"
+                                       {
+        (yyval.inteiro) = (yyvsp[-2].inteiro) + 1; // Incrementa o contador de variáveis
+        if (buscaSimbolo((yyvsp[0].string)) != NULL) {
+            yyerror("Variável já declarada");
+        } else {
+            adicionaSimbolo((yyvsp[0].string), (yyvsp[-3].inteiro)); // Usa o tipo propagado
+        }
+    }
+#line 1315 "calcbasica.tab.c"
+    break;
+
+  case 24: /* atribuicao: VARIAVEL ATRIBUICAO expressao  */
+#line 183 "calcbasica.y"
+                                  {
+        // Verifique se a variável foi declarada
+        EntradaSimbolo *entry = buscaSimbolo((yyvsp[-2].string));
+        if (entry == NULL) {
+            yyerror("Variável não declarada");
+        } else {
+            // Verifique se os tipos são compatíveis entre o tipo da variável e o tipo da expressão
+            if (entry->tipo != (yyvsp[0].inteiro)) {
+                yyerror("Tipos incompatíveis na atribuição");
+            }
+        }
+    }
+#line 1332 "calcbasica.tab.c"
+    break;
+
+  case 32: /* expressao: CONSTANTE_INTEIRA  */
+#line 214 "calcbasica.y"
+                      {
+        (yyval.inteiro) = INTEIRO;
+    }
+#line 1340 "calcbasica.tab.c"
+    break;
+
+  case 33: /* expressao: CONSTANTE_REAL  */
+#line 217 "calcbasica.y"
+                     {
+        (yyval.inteiro) = REAL;
+    }
+#line 1348 "calcbasica.tab.c"
+    break;
+
+  case 34: /* expressao: VARIAVEL  */
+#line 220 "calcbasica.y"
+               {
+        // Verifique se a variável foi declarada
+        EntradaSimbolo *entry = buscaSimbolo((yyvsp[0].string));
+        if (entry == NULL) {
+            yyerror("Variável não declarada");
+        } else {
+            (yyval.inteiro) = entry->tipo; // Atribui o tipo da variável
+        }
+    }
+#line 1362 "calcbasica.tab.c"
+    break;
+
+  case 35: /* expressao: expressao PRODUTO expressao  */
+#line 229 "calcbasica.y"
+                                  {
+        // Verifique a compatibilidade dos tipos
+        if ((yyvsp[-2].inteiro) != (yyvsp[0].inteiro)) {
+            yyerror("Tipos incompatíveis no produto");
+        }
+        (yyval.inteiro) = (yyvsp[-2].inteiro); // O tipo da expressão do produto será o tipo de $1
+    }
+#line 1374 "calcbasica.tab.c"
     break;
 
 
-#line 1180 "calcbasica.tab.c"
+#line 1378 "calcbasica.tab.c"
 
       default: break;
     }
@@ -1369,7 +1567,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 110 "calcbasica.y"
+#line 244 "calcbasica.y"
 
 
 void yyerror(const char *s) {
@@ -1388,7 +1586,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    inicializaTabela();
     yyparse();
     fclose(yyin);
+    imprimeTabela(); // Para ver os símbolos na tabela
     return 0;
 }

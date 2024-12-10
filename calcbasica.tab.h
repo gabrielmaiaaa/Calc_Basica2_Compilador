@@ -85,15 +85,26 @@ extern int yydebug;
     CONSTANTE_INTEIRA = 286,       /* CONSTANTE_INTEIRA  */
     CONSTANTE_REAL = 287,          /* CONSTANTE_REAL  */
     VARIAVEL = 288,                /* VARIAVEL  */
-    CADEIA = 289,                  /* CADEIA  */
-    y = 290                        /* y  */
+    CADEIA = 289                   /* CADEIA  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 85 "calcbasica.y"
+
+    int inteiro;
+    float real;
+    char caracter;
+    char *string;
+
+#line 105 "calcbasica.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
