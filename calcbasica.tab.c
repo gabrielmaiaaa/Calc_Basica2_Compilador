@@ -555,11 +555,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    53,    57,    58,    62,    63,    64,    65,
-      66,    70,    74,    81,    82,    86,    87,    88,    89,    90,
-      91,    95,    99,   103,   107,   113,   114,   118,   119,   120,
-     124,   125,   129,   130,   131,   132,   133,   134,   135,   136,
-     137
+       0,    48,    48,    55,    59,    60,    64,    65,    66,    67,
+      68,    72,    76,    83,    84,    88,    89,    90,    91,    92,
+      93,    97,   101,   105,   109,   115,   116,   120,   121,   122,
+     126,   127,   131,   132,   133,   134,   135,   136,   137,   138,
+     139
 };
 #endif
 
@@ -1179,7 +1179,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* programa: PROGRAMA VARIAVEL bloco FIM  */
-#line 46 "calcbasica.y"
+#line 48 "calcbasica.y"
                                  { 
         printf("Programa válido!\n");
         exibeTabela(&tabela); 
@@ -1188,37 +1188,37 @@ yyreduce:
     break;
 
   case 6: /* tipo: TIPO_INTEIRO  */
-#line 62 "calcbasica.y"
+#line 64 "calcbasica.y"
                     { tipoAtual = "INTEIRO"; }
 #line 1194 "calcbasica.tab.c"
     break;
 
   case 7: /* tipo: TIPO_REAL  */
-#line 63 "calcbasica.y"
+#line 65 "calcbasica.y"
                     { tipoAtual = "REAL"; }
 #line 1200 "calcbasica.tab.c"
     break;
 
   case 8: /* tipo: TIPO_CARACTER  */
-#line 64 "calcbasica.y"
+#line 66 "calcbasica.y"
                     { tipoAtual = "CARACTER"; }
 #line 1206 "calcbasica.tab.c"
     break;
 
   case 9: /* tipo: TIPO_LISTA_INT  */
-#line 65 "calcbasica.y"
+#line 67 "calcbasica.y"
                      { tipoAtual = "LISTA_INT"; }
 #line 1212 "calcbasica.tab.c"
     break;
 
   case 10: /* tipo: TIPO_LISTA_REAL  */
-#line 66 "calcbasica.y"
+#line 68 "calcbasica.y"
                       { tipoAtual = "LISTA_REAL"; }
 #line 1218 "calcbasica.tab.c"
     break;
 
   case 11: /* lista_variaveis: VARIAVEL  */
-#line 70 "calcbasica.y"
+#line 72 "calcbasica.y"
              {
         printf("AAA %s\n", yylval.string);
         processaDeclaracao(yylval.string);
@@ -1227,7 +1227,7 @@ yyreduce:
     break;
 
   case 12: /* lista_variaveis: lista_variaveis VIRGULA VARIAVEL  */
-#line 74 "calcbasica.y"
+#line 76 "calcbasica.y"
                                        {
         printf("AAA %s\n", yylval.string);
         processaDeclaracao(yylval.string);
@@ -1236,7 +1236,7 @@ yyreduce:
     break;
 
   case 24: /* atribuicao: VARIAVEL ATRIBUICAO expressao  */
-#line 107 "calcbasica.y"
+#line 109 "calcbasica.y"
                                   {
         processaAtribuicao(yylval.string, "expressao");
     }
@@ -1437,7 +1437,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 141 "calcbasica.y"
+#line 143 "calcbasica.y"
 
 
 void yyerror(const char *s) {

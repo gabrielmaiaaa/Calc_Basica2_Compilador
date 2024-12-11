@@ -4,13 +4,13 @@ INICIO
 INTEIRO arg, fat
 {ALGORITMO}
 LEIA arg
-fat := arg
+fat = arg
 SE arg .I. 0
-ENTAO fat := 1
+ENTAO fat = 1
 FIM_SE
-ENQUANTO arg .M. 1
+ENQUANTO arg .I. 1  
     fat = fat * arg
-    arg = arg - 1
+    arg = arg + 1 
 FIM_ENQUANTO
-ESCREVA "fatorial := ", fat
+ESCREVA "fatorial = ", fat
 FIM

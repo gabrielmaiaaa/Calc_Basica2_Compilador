@@ -94,8 +94,8 @@ Terminals, with rules where they appear
     ABRE_COLCHETE (283) 20
     FECHA_COLCHETE (284) 20
     VIRGULA (285) 11 28
-    CONSTANTE_INTEIRA (286) 31
-    CONSTANTE_REAL (287) 32
+    CONSTANTE_INTEIRA <inteiro> (286) 31
+    CONSTANTE_REAL <real> (287) 32
     VARIAVEL <string> (288) 1 10 11 23 29 30 33
     CADEIA (289) 27
 

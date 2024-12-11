@@ -33,6 +33,8 @@ void processaAtribuicao(char *var, char *valor);
 %token CONSTANTE_INTEIRA CONSTANTE_REAL VARIAVEL CADEIA
 
 %type <string> VARIAVEL
+%type <inteiro> CONSTANTE_INTEIRA
+%type <real> CONSTANTE_REAL
 
 
 /* Declaração de Precedência e Associatividade */
