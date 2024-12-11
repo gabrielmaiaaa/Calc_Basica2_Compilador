@@ -32,6 +32,8 @@ void liberaTabela(TabelaSimbolos *tabela);
 // Exibe todos os símbolos da tabela
 void exibeTabela(TabelaSimbolos *tabela);
 
+void salvar_token(const char* token, const char* tipo);
+
 // Função para checar declarações duplicadas
 void checaDeclaracaoDuplicada(TabelaSimbolos *tabela, const char *nome, const char *tipo);
 

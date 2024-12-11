@@ -1,0 +1,5 @@
+Tabela de Símbolos:
+----------------------------
+Nome: fat, Tipo: INTEIRO
+Nome: arg, Tipo: INTEIRO
+----------------------------

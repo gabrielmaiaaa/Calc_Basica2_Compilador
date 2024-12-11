@@ -13,61 +13,60 @@ NUMERO                  [0-9]+
 CONSTANTE_INTEIRA       {NUMERO}
 CONSTANTE_REAL          {NUMERO}"."{NUMERO}+
 ALFABETO                [a-zA-Z]
-VARIAVEL                {ALFABETO}({ALFABETO}|{NUMERO}|_)*
+VARIAVEL                {ALFABETO}({ALFABETO}|{NUMERO}|_)* 
 CADEIA                  (\'[^\']+\')|(\"[^\"]+\")
 COMENTARIOS             \{[^}]*\}
 ESPACOS                 [ \t\n]+
 
 %%
 
-"PROGRAMA"              { printf("Token: PROGRAMA\n"); return PROGRAMA; }
-"SE"                    { printf("Token: SE\n"); return SE; }
-"ENQUANTO"              { printf("Token: ENQUANTO\n"); return ENQUANTO; }
-"ENTAO"                 { printf("Token: ENTAO\n"); return ENTAO; }
-"ESCREVA"               { printf("Token: ESCREVA\n"); return ESCREVA; }
-"FIM_SE"                { printf("Token: FIM_SE\n"); return FIM_SE; }
-"FIM_ENQUANTO"          { printf("Token: FIM_ENQUANTO\n"); return FIM_ENQUANTO; }
-"FIM"                   { printf("Token: FIM\n"); return FIM; }
-"INICIO"                { printf("Token: INICIO\n"); return INICIO; }
-"LEIA"                  { printf("Token: LEIA\n"); return LEIA; }
-"+"                     { printf("Token: ADICAO\n"); return ADICAO; }
-":="                    { printf("Token: ATRIBUICAO\n"); return ATRIBUICAO; }
-"="                    { printf("Token: ATRIBUICAO\n"); return ATRIBUICAO; }
-"/"                     { printf("Token: DIVISAO\n"); return DIVISAO; }
-"*"                     { printf("Token: PRODUTO\n"); return PRODUTO; }
-"-"                     { printf("Token: SUBTRACAO\n"); return SUBTRACAO; }
-".I."                   { printf("Token: IGUAL\n"); return IGUAL; }
-".M."                   { printf("Token: MAIOR\n"); return MAIOR; }
-"CARACTER"              { printf("Token: TIPO_CARACTER\n"); return TIPO_CARACTER; }
-"INTEIRO"               { printf("Token: TIPO_INTEIRO\n"); return TIPO_INTEIRO; }
-"LISTA_INT"             { printf("Token: TIPO_LISTA_INT\n"); return TIPO_LISTA_INT; }
-"LISTA_REAL"            { printf("Token: TIPO_LISTA_REAL\n"); return TIPO_LISTA_REAL; }
-"REAL"                  { printf("Token: TIPO_REAL\n"); return TIPO_REAL; }
-"("                     { printf("Token: ABRE_PARENTESE\n"); return ABRE_PARENTESE; }
-")"                     { printf("Token: FECHA_PARENTESE\n"); return FECHA_PARENTESE; }
-"["                     { printf("Token: ABRE_COLCHETE\n"); return ABRE_COLCHETE; }
-"]"                     { printf("Token: FECHA_COLCHETE\n"); return FECHA_COLCHETE; }
-","                     { printf("Token: VIRGULA\n"); return VIRGULA; }                     
+"PROGRAMA"              { salvar_token(yytext, "PROGRAMA"); return PROGRAMA; }
+"SE"                    { salvar_token(yytext, "SE"); return SE; }
+"ENQUANTO"              { salvar_token(yytext, "ENQUANTO"); return ENQUANTO; }
+"ENTAO"                 { salvar_token(yytext, "ENTAO"); return ENTAO; }
+"ESCREVA"               { salvar_token(yytext, "ESCREVA"); return ESCREVA; }
+"FIM_SE"                { salvar_token(yytext, "FIM_SE"); return FIM_SE; }
+"FIM_ENQUANTO"          { salvar_token(yytext, "FIM_ENQUANTO"); return FIM_ENQUANTO; }
+"FIM"                   { salvar_token(yytext, "FIM"); return FIM; }
+"INICIO"                { salvar_token(yytext, "INICIO"); return INICIO; }
+"LEIA"                  { salvar_token(yytext, "LEIA"); return LEIA; }
+"+"                     { salvar_token(yytext, "ADICAO"); return ADICAO; }
+":="                    { salvar_token(yytext, "ATRIBUICAO"); return ATRIBUICAO; }
+"/"                     { salvar_token(yytext, "DIVISAO"); return DIVISAO; }
+"*"                     { salvar_token(yytext, "PRODUTO"); return PRODUTO; }
+"-"                     { salvar_token(yytext, "SUBTRACAO"); return SUBTRACAO; }
+".I."                   { salvar_token(yytext, "IGUAL"); return IGUAL; }
+".M."                   { salvar_token(yytext, "MAIOR"); return MAIOR; }
+"CARACTER"              { salvar_token(yytext, "TIPO_CARACTER"); return TIPO_CARACTER; }
+"INTEIRO"               { salvar_token(yytext, "TIPO_INTEIRO"); return TIPO_INTEIRO; }
+"LISTA_INT"             { salvar_token(yytext, "TIPO_LISTA_INT"); return TIPO_LISTA_INT; }
+"LISTA_REAL"            { salvar_token(yytext, "TIPO_LISTA_REAL"); return TIPO_LISTA_REAL; }
+"REAL"                  { salvar_token(yytext, "TIPO_REAL"); return TIPO_REAL; }
+"("                     { salvar_token(yytext, "ABRE_PARENTESE"); return ABRE_PARENTESE; }
+")"                     { salvar_token(yytext, "FECHA_PARENTESE"); return FECHA_PARENTESE; }
+"["                     { salvar_token(yytext, "ABRE_COLCHETE"); return ABRE_COLCHETE; }
+"]"                     { salvar_token(yytext, "FECHA_COLCHETE"); return FECHA_COLCHETE; }
+","                     { salvar_token(yytext, "VIRGULA"); return VIRGULA; }                     
 
 {VARIAVEL} {
     yylval.string = strdup(yytext);
-    printf("Token: VARIAVEL (%s)\n", yytext);
+    salvar_token(yytext, "VARIAVEL");
     return VARIAVEL;
 }
 
 {CONSTANTE_INTEIRA} {
     yylval.inteiro = atoi(yytext);
-    printf("Token: CONSTANTE_INTEIRA (%s)\n", yytext);
+    salvar_token(yytext, "CONSTANTE_INTEIRA");
     return CONSTANTE_INTEIRA;
 }
 
 {CONSTANTE_REAL} {
     yylval.real = atof(yytext);
-    printf("Token: CONSTANTE_REAL (%s)\n", yytext);
+    salvar_token(yytext, "CONSTANTE_REAL");
     return CONSTANTE_REAL;
 }
 
-{CADEIA}                { printf("Token: CADEIA (%s)\n", yytext); return CADEIA; }
+{CADEIA}                { salvar_token(yytext, "CADEIA"); return CADEIA; }
 {COMENTARIOS}           { /* Ignora comentários */ }
 {ESPACOS}               { /* Ignora espaços em branco */ }
 

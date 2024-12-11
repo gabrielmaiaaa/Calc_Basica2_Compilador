@@ -2,90 +2,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "tabela.h"
 
-#define TABLE_SIZE 100
-
-// Definindo os tipos possíveis de variáveis
-typedef enum { INTEIRO, REAL, CARACTER, LISTA_INT, LISTA_REAL } TipoVariavel;
-
-// União para armazenar os valores das variáveis
-typedef union {
-    int inteiro;
-    float real;
-    char caracter;
-} ValorVariavel;
-
-// Estrutura para representar uma entrada na tabela de símbolos
-typedef struct EntradaSimbolo {
-    char nome[50];
-    TipoVariavel tipo;
-    ValorVariavel valor;
-    struct EntradaSimbolo *next;
-} EntradaSimbolo;
-
-// Função de hash para a tabela de símbolos
-unsigned int hash(char *nome) {
-    unsigned int h = 0;
-    for (int i = 0; nome[i] != '\0'; i++) {
-        h = (h * 31) + nome[i];
-    }
-    return h % TABLE_SIZE;
-}
-
-// Estrutura da tabela de símbolos
-EntradaSimbolo *tabelaSimbolos[TABLE_SIZE];
-
-// Função para inicializar a tabela de símbolos
-void inicializaTabela() {
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        tabelaSimbolos[i] = NULL;
-    }
-}
-
-// Função para adicionar uma variável à tabela de símbolos
-void adicionaSimbolo(char *nome, TipoVariavel tipo) {
-    unsigned int index = hash(nome);
-    EntradaSimbolo *novo = (EntradaSimbolo *)malloc(sizeof(EntradaSimbolo));
-    strcpy(novo->nome, nome);
-    novo->tipo = tipo;
-    novo->next = tabelaSimbolos[index];
-    tabelaSimbolos[index] = novo;
-}
-
-// Função para buscar uma variável na tabela de símbolos
-EntradaSimbolo *buscaSimbolo(char *nome) {
-    unsigned int index = hash(nome);
-    EntradaSimbolo *entry = tabelaSimbolos[index];
-    while (entry != NULL) {
-        if (strcmp(entry->nome, nome) == 0) {
-            return entry;
-        }
-        entry = entry->next;
-    }
-    return NULL;
-}
-
-// Função para imprimir a tabela de símbolos
-void imprimeTabela() {
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        EntradaSimbolo *entry = tabelaSimbolos[i];
-        while (entry != NULL) {
-            printf("Nome: %s, Tipo: %d\n", entry->nome, entry->tipo);
-            entry = entry->next;
-        }
-    }
-}
-
+#define LIMITE_VETOR 100  // Defina o tamanho máximo desejado para o vetor
 
 void yyerror(const char *s);
 int yylex(void);
 extern FILE *yyin;
+
+// Tabela de símbolos
+TabelaSimbolos tabela;
+
+// Tipo atual para as declarações
+char *tipoAtual;
+
+// Funções auxiliares para lidar com declarações e comandos
+void processaDeclaracao(char *nome);
+void processaAtribuicao(char *var, char *valor);
 %}
 
 %union {
     int inteiro;
     float real;
-    char caracter;
     char *string;
 }
 
@@ -97,7 +35,9 @@ extern FILE *yyin;
 %token CONSTANTE_INTEIRA CONSTANTE_REAL VARIAVEL CADEIA
 
 %type <string> VARIAVEL
-%type <inteiro> expressao lista_variaveis tipo
+%type <inteiro> CONSTANTE_INTEIRA
+%type <real> CONSTANTE_REAL
+
 
 /* Declaração de Precedência e Associatividade */
 %left IGUAL MAIOR
@@ -107,7 +47,10 @@ extern FILE *yyin;
 %%
 
 programa:
-    PROGRAMA VARIAVEL bloco  FIM { printf("Programa válido!\n"); }
+    PROGRAMA VARIAVEL bloco  FIM { 
+        printf("Programa válido!\n");
+        exibeTabela(&tabela); 
+        }
     ;
 
 bloco:
@@ -115,49 +58,27 @@ bloco:
     ;
 
 declaracoes:
-    tipo lista_variaveis {
-        char *listaVariaveis[$2]; // Aloca espaço para armazenar os nomes das variáveis
-        for (int i = 0; i < $2; i++) {
-            adicionaSimbolo(listaVariaveis[i], $1); // Passa o tipo e o nome
-        }
-    }
+    tipo lista_variaveis
     | declaracoes tipo lista_variaveis
-;
-
+    ;
 
 tipo:
-    TIPO_INTEIRO { $$ = INTEIRO;}
-    | TIPO_REAL { $$ = REAL; }
-    | TIPO_CARACTER { $$ = CARACTER; }
-    | TIPO_LISTA_INT { $$ = LISTA_INT; }
-    | TIPO_LISTA_REAL { $$ = LISTA_REAL; }
-;
+    TIPO_INTEIRO    { tipoAtual = "INTEIRO"; }
+    | TIPO_REAL     { tipoAtual = "REAL"; }
+    | TIPO_CARACTER { tipoAtual = "CARACTER"; }
+    | TIPO_LISTA_INT { tipoAtual = "LISTA_INT"; }
+    | TIPO_LISTA_REAL { tipoAtual = "LISTA_REAL"; }
+    ;
 
 lista_variaveis:
     VARIAVEL {
-        printf("attttaaa\n");
-        $$ = 1; // Uma variável foi processada
-        if (buscaSimbolo($1) != NULL) {
-            printf("attttaaa\n");
-            yyerror("Variável já declarada");
-        } else {
-            printf("attttaaa3\n");
-            adicionaSimbolo($1, $<inteiro>0); // Aqui $<inteiro>0 é o tipo propagado
-        }
-        printf("attttaaa4\n");
+        processaDeclaracao(yylval.string);
     }
     | lista_variaveis VIRGULA VARIAVEL {
-        printf("aaassssa\n");
-        $$ = $1 + 1; // Incrementa o contador de variáveis
-        if (buscaSimbolo($3) != NULL) {
-            yyerror("Variável já declarada");
-        } else {
-            printf("aaaaa\n");
-            adicionaSimbolo($3, $<inteiro>0); // Usa o tipo propagado
-        }
+        processaDeclaracao(yylval.string);
     }
-;
-
+    | lista_variaveis VIRGULA CADEIA
+    ;
 
 comandos:
     comando
@@ -171,11 +92,31 @@ comando:
     | condicao
     | repeticao
     | acesso_lista
+    | dividir
+    | CADEIA
     ;
 
 acesso_lista:
-    ABRE_COLCHETE expressao FECHA_COLCHETE
-    ;
+    ABRE_COLCHETE CONSTANTE_INTEIRA FECHA_COLCHETE {
+        int indice = yylval.inteiro;
+        if (indice < 0 || indice >= LIMITE_VETOR) {
+            yyerror("Erro: Índice do vetor fora dos limites.");
+            exit(1); 
+        }
+    }
+    | ABRE_COLCHETE VARIAVEL FECHA_COLCHETE {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1);
+            }
+        }
+        int indice = yylval.inteiro;
+        if (indice < 0 || indice >= LIMITE_VETOR) {
+            yyerror("Erro: Índice do vetor fora dos limites.");
+            exit(1); 
+        }
+    }
 
 condicao:
     SE expressao ENTAO comandos FIM_SE
@@ -185,20 +126,21 @@ repeticao:
     ENQUANTO expressao comandos FIM_ENQUANTO
     ;
 
+dividir:
+    expressao VARIAVEL
+    ;
+
 atribuicao:
     VARIAVEL ATRIBUICAO expressao {
-        // Verifique se a variável foi declarada
-        EntradaSimbolo *entry = buscaSimbolo($1);
-        if (entry == NULL) {
-            yyerror("Variável não declarada");
-        } else {
-            // Verifique se os tipos são compatíveis entre o tipo da variável e o tipo da expressão
-            if (entry->tipo != $3) {
-                yyerror("Tipos incompatíveis na atribuição");
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1);
             }
         }
+        processaAtribuicao(yylval.string, "expressao");
     }
-;
+    ;
 
 escrita:
     ESCREVA ABRE_PARENTESE lista_argumentos FECHA_PARENTESE
@@ -212,39 +154,61 @@ lista_argumentos:
     ;
 
 leitura:
-    LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE
-    | LEIA VARIAVEL
+    LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1);
+            }
+        }
+    }
+    | LEIA ABRE_COLCHETE VARIAVEL FECHA_COLCHETE {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1);
+            }
+        }
+    }
+    | LEIA VARIAVEL {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1);
+            }
+        }
+    }
     ;
 
 expressao:
-    CONSTANTE_INTEIRA {
-        $$ = INTEIRO;
-    }
-    | CONSTANTE_REAL {
-        $$ = REAL;
-    }
+    CONSTANTE_INTEIRA
+    | CONSTANTE_REAL
     | VARIAVEL {
-        // Verifique se a variável foi declarada
-        EntradaSimbolo *entry = buscaSimbolo($1);
-        if (entry == NULL) {
-            yyerror("Variável não declarada");
-        } else {
-            $$ = entry->tipo; // Atribui o tipo da variável
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1);
+            }
         }
     }
-    | expressao PRODUTO expressao {
-        // Verifique a compatibilidade dos tipos
-        if ($1 != $3) {
-            yyerror("Tipos incompatíveis no produto");
+    | expressao PRODUTO expressao
+    | expressao DIVISAO CONSTANTE_INTEIRA {
+        if (yylval.inteiro == 0) {
+            yyerror("Erro: Divisão por zero.");
+            exit(1); 
         }
-        $$ = $1; // O tipo da expressão do produto será o tipo de $1
     }
-    | expressao DIVISAO expressao
+    | expressao DIVISAO CONSTANTE_REAL {
+        if (yylval.real == 0.0) {
+            yyerror("Erro: Divisão por zero.");
+            exit(1); 
+        }
+    }
     | expressao ADICAO expressao
     | expressao SUBTRACAO expressao
     | expressao IGUAL expressao
     | expressao MAIOR expressao
-;
+    ;
 
 
 %%
@@ -265,9 +229,23 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    inicializaTabela();
     yyparse();
     fclose(yyin);
-    imprimeTabela(); // Para ver os símbolos na tabela
     return 0;
+}
+
+/* Funções auxiliares */
+
+void processaDeclaracao(char *nome) {
+    adicionaSimbolo(&tabela, nome, tipoAtual);
+}
+
+
+void processaAtribuicao(char *var, char *valor) {
+    if (var != NULL && var[0] != '\0') {
+        if (!buscaSimbolo(&tabela, var)) {
+            fprintf(stderr, "Erro: Variável '%s' não declarada.\n", var);
+            exit(1);   
+        }
+    } 
 }

@@ -4,6 +4,8 @@
 #include <string.h>
 #include "tabela.h"
 
+#define LIMITE_VETOR 100  // Defina o tamanho máximo desejado para o vetor
+
 void yyerror(const char *s);
 int yylex(void);
 extern FILE *yyin;
@@ -70,13 +72,12 @@ tipo:
 
 lista_variaveis:
     VARIAVEL {
-        printf("AAA %s\n", yylval.string);
         processaDeclaracao(yylval.string);
     }
     | lista_variaveis VIRGULA VARIAVEL {
-        printf("AAA %s\n", yylval.string);
         processaDeclaracao(yylval.string);
     }
+    | lista_variaveis VIRGULA CADEIA
     ;
 
 comandos:
@@ -91,11 +92,30 @@ comando:
     | condicao
     | repeticao
     | acesso_lista
+    | CADEIA
     ;
 
 acesso_lista:
-    ABRE_COLCHETE expressao FECHA_COLCHETE
-    ;
+    ABRE_COLCHETE CONSTANTE_INTEIRA FECHA_COLCHETE {
+        int indice = yylval.inteiro;
+        if (indice < 0 || indice >= LIMITE_VETOR) {
+            yyerror("Erro: Índice do vetor fora dos limites.");
+            exit(1);
+        }
+    }
+    | ABRE_COLCHETE VARIAVEL FECHA_COLCHETE {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1); 
+            }
+        }
+        int indice = yylval.inteiro;
+        if (indice < 0 || indice >= LIMITE_VETOR) {
+            yyerror("Erro: Índice do vetor fora dos limites.");
+            exit(1);
+        }
+    }
 
 condicao:
     SE expressao ENTAO comandos FIM_SE
@@ -107,6 +127,12 @@ repeticao:
 
 atribuicao:
     VARIAVEL ATRIBUICAO expressao {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1); 
+            }
+        }
         processaAtribuicao(yylval.string, "expressao");
     }
     ;
@@ -123,16 +149,56 @@ lista_argumentos:
     ;
 
 leitura:
-    LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE
-    | LEIA VARIAVEL
+    LEIA ABRE_PARENTESE VARIAVEL FECHA_PARENTESE {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1); 
+            }
+        }
+    }
+    | LEIA ABRE_COLCHETE VARIAVEL FECHA_COLCHETE {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1); 
+            }
+        }
+    }
+    | LEIA VARIAVEL {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1); 
+            }
+        }
+    }
     ;
 
 expressao:
     CONSTANTE_INTEIRA
     | CONSTANTE_REAL
-    | VARIAVEL
+    | VARIAVEL {
+        if (yylval.string != NULL && yylval.string[0] != '\0') {
+            if (!buscaSimbolo(&tabela, yylval.string)) {
+                fprintf(stderr, "Erro: Variável '%s' não declarada.\n", yylval.string);
+                exit(1); 
+            }
+        }
+    }
     | expressao PRODUTO expressao
-    | expressao DIVISAO expressao
+    | expressao DIVISAO CONSTANTE_INTEIRA {
+        if (yylval.inteiro == 0) {
+            yyerror("Erro: Divisão por zero.");
+            exit(1);
+        }
+    }
+    | expressao DIVISAO CONSTANTE_REAL {
+        if (yylval.real == 0.0) {
+            yyerror("Erro: Divisão por zero.");
+            exit(1);
+        }
+    }
     | expressao ADICAO expressao
     | expressao SUBTRACAO expressao
     | expressao IGUAL expressao
@@ -171,9 +237,10 @@ void processaDeclaracao(char *nome) {
 
 
 void processaAtribuicao(char *var, char *valor) {
-    if (!buscaSimbolo(&tabela, var)) {
-        fprintf(stderr, "Erro: Variável '%s' não declarada.\n", var);
-    } else {
-        printf("Atribuição: %s := %s\n", var, valor);
-    }
+    if (var != NULL && var[0] != '\0') {
+        if (!buscaSimbolo(&tabela, var)) {
+            fprintf(stderr, "Erro: Variável '%s' não declarada.\n", var);
+            exit(1);    
+        }
+    } 
 }
